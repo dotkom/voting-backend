@@ -1,3 +1,13 @@
+# Doppler
+`doppler setup` project `voting-backend` and environment `dev`
+
+# Running locally
+`doppler run -- yarn run dev`
+
+# Running in docker
+`docker build -t voting/prod/backend .`
+`doppler run -- docker run -p 4000:4000 voting/prod/backend:latest`
+
 # Starting
 
 To quickly start the server in mockmode run:
