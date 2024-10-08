@@ -1,25 +1,29 @@
-## this is the stage one , also know as the build step
+# Use an official Node.js runtime as a parent image
+FROM node:14
 
-FROM node:14-alpine
+# Set the working directory
 WORKDIR /app
-COPY package.json ./
-COPY yarn.lock ./
-# This will cache
-RUN yarn 
-COPY ./prisma/schema.prisma ./
-RUN yarn generate
+
+# Copy package.json and yarn.lock to the working directory
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy the Prisma schema to the working directory
+COPY ./prisma/schema.prisma ./prisma/
+
+# Generate Prisma client
+RUN yarn prisma generate
+
+# Copy the rest of the application code to the working directory
 COPY . .
+
+# Build the application
 RUN yarn run build
 
-## this is stage two , where the app actually runs
+# Expose the port the app runs on
+EXPOSE 4000
 
-FROM node:14-alpine
-
-WORKDIR /app
-COPY package.json ./
-COPY yarn.lock ./
-COPY ./prisma/schema.prisma ./
-RUN yarn --only=production
-COPY --from=0 /app/dist ./dist
-EXPOSE 3000
-CMD yarn start
+# Start the application
+CMD ["yarn", "start"]
