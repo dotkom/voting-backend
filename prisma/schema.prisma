@@ -38,7 +38,7 @@ enum VotationStatus {
 }
 
 model User {
-  id            String        @id @default(uuid()) @db.Uuid
+  id            String        @id @default(uuid())
   email         String        @unique @db.VarChar(255)
   emailVerified Boolean       @default(false)
   password      String
@@ -48,13 +48,13 @@ model User {
 }
 
 model Meeting {
-  id           String        @id @default(uuid()) @db.Uuid
+  id           String        @id @default(uuid())
   organization String
   title        String        @db.VarChar(255)
   startTime    DateTime
   description  String?
   owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId      String        @db.Uuid
+  ownerId      String
   votations    Votation[]
   status       MeetingStatus @default(UPCOMING)
   allowSelfRegistration Boolean @default(false)
@@ -63,10 +63,10 @@ model Meeting {
 }
 
 model Participant {
-  id               String  @id @default(uuid()) @db.Uuid
+  id               String  @id @default(uuid())
   role             Role
-  userId           String  @db.Uuid
-  meetingId        String  @db.Uuid
+  userId           String
+  meetingId        String 
   isVotingEligible Boolean @default(true)
   user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   meeting          Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
@@ -76,9 +76,9 @@ model Participant {
 }
 
 model VotationResultReview {
-  votationId String @db.Uuid
+  votationId String
   votation Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
-  participantId String @db.Uuid
+  participantId String
   participant Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   approved Boolean
 
@@ -89,14 +89,14 @@ model Invite {
   email            String
   role             Role
   isVotingEligible Boolean
-  meetingId        String  @db.Uuid
+  meetingId        String
   meeting          Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   @@unique([email, meetingId])
 }
 
 model Votation {
-  id                String         @id @default(uuid()) @db.Uuid
+  id                String         @id @default(uuid())
   title             String         @db.VarChar(255)
   description       String?
   status            VotationStatus @default(UPCOMING)
@@ -107,7 +107,7 @@ model Votation {
   numberOfWinners   Int            @default(1)
   majorityThreshold Int
   index             Int
-  meetingId         String         @db.Uuid
+  meetingId         String
   meeting           Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   stvVotes          StvVote[]
   alternatives      Alternative[]
@@ -118,8 +118,8 @@ model Votation {
 }
 
 model HasVoted {
-  votationId String   @db.Uuid
-  userId     String   @db.Uuid
+  votationId String
+  userId     String
   createdAt  DateTime @default(now())
   votation   Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -128,43 +128,43 @@ model HasVoted {
 }
 
 model Alternative {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String   @id @default(uuid())
   text       String   @db.VarChar(120)
   index      Int      @default(0)
-  votationId String   @db.Uuid
+  votationId String  
   votation   Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
   isWinner   Boolean  @default(false)
   votes      Vote[]
   roundVoteCount AlternativeRoundVoteCount[]
-  winnerOfStvRoundId String? @db.Uuid
+  winnerOfStvRoundId String?
   winnerOfStvRound StvRoundResult? @relation(name: "winnerOfStvRound", fields: [winnerOfStvRoundId], references: [id])
-  loserOfStvRoundId String? @db.Uuid
+  loserOfStvRoundId String?
   loserOfStvRound StvRoundResult? @relation(name: "loserOfStvRound", fields: [loserOfStvRoundId], references: [id])
 }
 
 model StvVote {
-  id String @id @default(uuid()) @db.Uuid
-  votationId String @db.Uuid
+  id String @id @default(uuid())
+  votationId String
   votation Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
   votes Vote[]
 }
 
 model AlternativeRoundVoteCount {
-  alterantiveId    String @db.Uuid
+  alterantiveId    String
   alternative      Alternative @relation(fields: [alterantiveId], references: [id], onDelete: Cascade)
   voteCount        Float
-  stvRoundResultId String @db.Uuid
+  stvRoundResultId String
   stvRoundResult   StvRoundResult @relation(fields: [stvRoundResultId], references: [id], onDelete: Cascade)
 
   @@id([alterantiveId, stvRoundResultId])
 }
 
 model StvRoundResult {
-  id String @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid())
   index Int 
-  stvResultId String? @db.Uuid
+  stvResultId String?
   stvResult StvResult? @relation(fields: [stvResultId], references: [votationId], onDelete: Cascade)
-  resultId String? @db.Uuid
+  resultId String?
   result VotationResult? @relation(fields: [resultId], references: [votationId], onDelete: Cascade)
   winners Alternative[] @relation(name: "winnerOfStvRound")
   losers Alternative[] @relation(name: "loserOfStvRound")
@@ -174,14 +174,14 @@ model StvRoundResult {
 
 // DEPRECATED 
 model StvResult {
-  votationId String @db.Uuid @id
+  votationId String @id
   votation Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
   quota Int
   stvRoundResult StvRoundResult[]
 }
 
 model VotationResult {
-  votationId String @db.Uuid @id
+  votationId String @id
   votation Votation @relation(fields: [votationId], references: [id], onDelete: Cascade)
   votingEligibleCount Int
   voteCount Int
@@ -191,10 +191,10 @@ model VotationResult {
 }
 
 model Vote {
-  id            String      @id @default(uuid()) @db.Uuid
+  id            String      @id @default(uuid())
   alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId String      @db.Uuid
+  alternativeId String
   ranking       Int         @default(1) 
-  stvVoteId     String?      @db.Uuid
+  stvVoteId     String?
   stvVote       StvVote?    @relation(fields: [stvVoteId], references: [id], onDelete: Cascade)
 }
