@@ -4,7 +4,7 @@ import Redis from 'ioredis';
 
 const options: Redis.RedisOptions = {
     host: process.env.REDIS_HOST,
-    port: 6380,
+    port: 6379,
     tls: {
         servername: process.env.REDIS_HOST,
     },
