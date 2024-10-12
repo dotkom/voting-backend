@@ -36,7 +36,7 @@ export const createGraphqlServer = async (server: ApolloServer, prisma: PrismaCl
     app.use(checkJwt);
     app.use(
         cors({
-            origin: 'http://localhost:3000/',
+            origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000/',
         })
     );
     if (process.env.MOCKING != 'true') await prisma.$connect();
