@@ -17,9 +17,7 @@ export const createApollo = (prisma: PrismaClient) => {
             if (req.user) {
                 const decodedToken = req.user as DecodedToken;
                 const userId = decodedToken.sub.split('|')[1];
-                if (process.env.NODE_ENV != 'production') {
-                    await saveAuth0UserIfNotExist(prisma, userId, req.headers['authorization']);
-                }
+                await saveAuth0UserIfNotExist(prisma, userId, req.headers['authorization']);
                 return { userId: userId, prisma };
             }
             return { userId: '', prisma };
